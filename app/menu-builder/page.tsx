@@ -1,9 +1,15 @@
-"use client";
+'use client';
 
-import { useEffect, useState, FormEvent } from "react";
-import { MenuItem } from "@/lib/types";
-import { getMenuItems, setMenuItems } from "@/lib/menu-storage";
-import Link from "next/link";
+import { useState, FormEvent } from 'react';
+import Link from 'next/link';
+
+import { MenuItem } from '@/lib/types';
+import { getMenuItems, setMenuItems } from '@/lib/menu-storage';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 type FormState = {
   name: string;
@@ -18,24 +24,19 @@ type FormErrors = {
 };
 
 export default function MenuBuilderPage() {
-  const [items, setItems] = useState<MenuItem[]>([]);
+  const [items, setItems] = useState<MenuItem[]>(() => getMenuItems());
   const [form, setForm] = useState<FormState>({
-    name: "",
-    price: "",
-    category: "",
+    name: '',
+    price: '',
+    category: '',
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  useEffect(() => {
-    const stored = getMenuItems();
-    setItems(stored);
-  }, []);
-
   const isEditing = editingId !== null;
 
   function resetForm() {
-    setForm({ name: "", price: "", category: "" });
+    setForm({ name: '', price: '', category: '' });
     setErrors({});
     setEditingId(null);
   }
@@ -44,18 +45,18 @@ export default function MenuBuilderPage() {
     const nextErrors: FormErrors = {};
 
     if (!form.name.trim()) {
-      nextErrors.name = "Name is required.";
+      nextErrors.name = 'Name is required.';
     }
 
     const priceNumber = Number(form.price);
-    if (Number.isNaN(priceNumber) || form.price.trim() === "") {
-      nextErrors.price = "Price must be a number.";
+    if (Number.isNaN(priceNumber) || form.price.trim() === '') {
+      nextErrors.price = 'Price must be a number.';
     } else if (priceNumber < 0) {
-      nextErrors.price = "Price must be greater than or equal to 0.";
+      nextErrors.price = 'Price must be greater than or equal to 0.';
     }
 
     if (!form.category.trim()) {
-      nextErrors.category = "Category is required.";
+      nextErrors.category = 'Category is required.';
     }
 
     setErrors(nextErrors);
@@ -85,7 +86,7 @@ export default function MenuBuilderPage() {
     } else {
       const newItem: MenuItem = {
         id:
-          typeof crypto !== "undefined" && "randomUUID" in crypto
+          typeof crypto !== 'undefined' && 'randomUUID' in crypto
             ? crypto.randomUUID()
             : `${Date.now()}-${Math.random().toString(16).slice(2)}`,
         name: form.name.trim(),
@@ -121,229 +122,188 @@ export default function MenuBuilderPage() {
   }
 
   return (
-    <main className="min-h-screen bg-neutral-50 px-4 py-10 text-neutral-900">
-      <div className="mx-auto flex max-w-5xl flex-col gap-8">
-        <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <main className='min-h-screen bg-neutral-50 px-4 py-10 text-neutral-900'>
+      <div className='mx-auto flex max-w-5xl flex-col gap-8'>
+        <header className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">
-              Menu Builder
-            </h1>
-            <p className="mt-1 text-sm text-neutral-600">
-              Create, edit, and delete menu items. Items are saved in this
-              browser so they can be used on the order screen.
+            <h1 className='text-2xl font-semibold tracking-tight'>Menu Builder</h1>
+            <p className='mt-1 text-sm text-neutral-600'>
+              Create, edit, and delete menu items. Items are saved in this browser so they can be used on the
+              order screen.
             </p>
           </div>
-          <nav className="flex gap-2 text-sm">
+          <nav className='flex gap-2 text-sm'>
             <Link
-              href="/"
-              className="rounded-full border border-neutral-200 px-4 py-2 text-neutral-700 transition hover:bg-neutral-100"
+              href='/'
+              className='rounded-full border border-neutral-200 px-4 py-2 text-neutral-700 transition hover:bg-neutral-100'
             >
               Home
             </Link>
             <Link
-              href="/order"
-              className="rounded-full bg-neutral-900 px-4 py-2 font-medium text-neutral-50 transition hover:bg-neutral-800"
+              href='/order'
+              className='rounded-full bg-neutral-900 px-4 py-2 font-medium text-neutral-50 transition hover:bg-neutral-800'
             >
               Order Screen
             </Link>
           </nav>
         </header>
 
-        <section className="grid gap-8 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
-          <form
-            onSubmit={handleSubmit}
-            className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-neutral-200"
-          >
-            <h2 className="text-lg font-semibold">
-              {isEditing ? "Edit menu item" : "Add new menu item"}
-            </h2>
-            <p className="mt-1 text-xs text-neutral-500">
-              Price 0 means the item is open price. The cashier will choose the
-              price when ordering.
-            </p>
+        <section className='grid gap-8 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]'>
+          <Card>
+            <CardHeader>
+              <CardTitle className='text-lg'>{isEditing ? 'Edit menu item' : 'Add new menu item'}</CardTitle>
+              <CardDescription className='text-xs'>
+                Price 0 means the item is open price. The cashier will choose the price when ordering.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className='space-y-4'>
+                <div className='space-y-1.5'>
+                  <Label htmlFor='name'>Name</Label>
+                  <Input
+                    id='name'
+                    type='text'
+                    value={form.name}
+                    onChange={(e) =>
+                      setForm((current) => ({
+                        ...current,
+                        name: e.target.value,
+                      }))
+                    }
+                    placeholder='Espresso'
+                    aria-invalid={Boolean(errors.name) || undefined}
+                  />
+                  {errors.name && <p className='text-xs text-red-600'>{errors.name}</p>}
+                </div>
 
-            <div className="mt-5 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-neutral-800">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  value={form.name}
-                  onChange={(e) =>
-                    setForm((current) => ({
-                      ...current,
-                      name: e.target.value,
-                    }))
-                  }
-                  className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm shadow-sm outline-none focus:border-neutral-800 focus:ring-1 focus:ring-neutral-800"
-                  placeholder="Espresso"
-                />
-                {errors.name && (
-                  <p className="mt-1 text-xs text-red-600">{errors.name}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-neutral-800">
-                  Price
-                </label>
-                <input
-                  type="number"
-                  min={0}
-                  step="0.01"
-                  value={form.price}
-                  onChange={(e) =>
-                    setForm((current) => ({
-                      ...current,
-                      price: e.target.value,
-                    }))
-                  }
-                  className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm shadow-sm outline-none focus:border-neutral-800 focus:ring-1 focus:ring-neutral-800"
-                  placeholder="3.50"
-                />
-                <p className="mt-1 text-xs text-neutral-500">
-                  Set to 0 for open price items (cashier chooses price when
-                  ordering).
-                </p>
-                {errors.price && (
-                  <p className="mt-1 text-xs text-red-600">{errors.price}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-neutral-800">
-                  Category
-                </label>
-                <input
-                  type="text"
-                  value={form.category}
-                  onChange={(e) =>
-                    setForm((current) => ({
-                      ...current,
-                      category: e.target.value,
-                    }))
-                  }
-                  className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm shadow-sm outline-none focus:border-neutral-800 focus:ring-1 focus:ring-neutral-800"
-                  placeholder="Drinks"
-                />
-                {errors.category && (
-                  <p className="mt-1 text-xs text-red-600">
-                    {errors.category}
+                <div className='space-y-1.5'>
+                  <Label htmlFor='price'>Price</Label>
+                  <Input
+                    id='price'
+                    type='number'
+                    min={0}
+                    step='0.01'
+                    value={form.price}
+                    onChange={(e) =>
+                      setForm((current) => ({
+                        ...current,
+                        price: e.target.value,
+                      }))
+                    }
+                    placeholder='3.50'
+                    aria-invalid={Boolean(errors.price) || undefined}
+                  />
+                  <p className='text-xs text-neutral-500'>
+                    Set to 0 for open price items (cashier chooses price when ordering).
                   </p>
-                )}
+                  {errors.price && <p className='text-xs text-red-600'>{errors.price}</p>}
+                </div>
+
+                <div className='space-y-1.5'>
+                  <Label htmlFor='category'>Category</Label>
+                  <Input
+                    id='category'
+                    type='text'
+                    value={form.category}
+                    onChange={(e) =>
+                      setForm((current) => ({
+                        ...current,
+                        category: e.target.value,
+                      }))
+                    }
+                    placeholder='Drinks'
+                    aria-invalid={Boolean(errors.category) || undefined}
+                  />
+                  {errors.category && <p className='text-xs text-red-600'>{errors.category}</p>}
+                </div>
+
+                <CardFooter className='px-0'>
+                  <div className='flex flex-wrap gap-3'>
+                    <Button type='submit' className='cursor-pointer'>
+                      {isEditing ? 'Save changes' : 'Add item'}
+                    </Button>
+                    {isEditing && (
+                      <Button type='button' variant='outline' onClick={resetForm}>
+                        Cancel edit
+                      </Button>
+                    )}
+                  </div>
+                </CardFooter>
+              </form>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className='flex flex-row items-center justify-between gap-2'>
+              <div>
+                <CardTitle className='text-lg'>Current menu</CardTitle>
+                <CardDescription className='text-xs'>
+                  {items.length === 0
+                    ? 'No items yet. Add your first item on the left.'
+                    : `${items.length} item${items.length === 1 ? '' : 's'}`}
+                </CardDescription>
               </div>
-            </div>
-
-            <div className="mt-6 flex flex-wrap gap-3">
-              <button
-                type="submit"
-                className="rounded-full bg-neutral-900 px-5 py-2 text-sm font-medium text-neutral-50 shadow-sm transition hover:bg-neutral-800"
-              >
-                {isEditing ? "Save changes" : "Add item"}
-              </button>
-              {isEditing && (
-                <button
-                  type="button"
-                  onClick={resetForm}
-                  className="rounded-full border border-neutral-200 px-4 py-2 text-sm font-medium text-neutral-700 transition hover:bg-neutral-100"
-                >
-                  Cancel edit
-                </button>
-              )}
-            </div>
-          </form>
-
-          <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-neutral-200">
-            <div className="flex items-center justify-between gap-2">
-              <h2 className="text-lg font-semibold">Current menu</h2>
-              <p className="text-xs text-neutral-500">
-                {items.length === 0
-                  ? "No items yet. Add your first item on the left."
-                  : `${items.length} item${items.length === 1 ? "" : "s"}`}
-              </p>
-            </div>
-
-            <div className="mt-4 overflow-hidden rounded-xl border border-neutral-200">
-              <table className="min-w-full divide-y divide-neutral-200 text-sm">
-                <thead className="bg-neutral-50">
-                  <tr>
-                    <th className="px-4 py-3 text-left font-medium text-neutral-600">
-                      Name
-                    </th>
-                    <th className="px-4 py-3 text-left font-medium text-neutral-600">
-                      Category
-                    </th>
-                    <th className="px-4 py-3 text-right font-medium text-neutral-600">
-                      Price
-                    </th>
-                    <th className="px-4 py-3 text-right font-medium text-neutral-600">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-neutral-100 bg-white">
-                  {items.length === 0 ? (
-                    <tr>
-                      <td
-                        colSpan={4}
-                        className="px-4 py-6 text-center text-sm text-neutral-500"
-                      >
-                        No menu items yet.
-                      </td>
-                    </tr>
-                  ) : (
-                    items.map((item) => (
-                      <tr key={item.id}>
-                        <td className="px-4 py-3 align-middle text-sm">
-                          <div className="font-medium text-neutral-900">
-                            {item.name}
-                          </div>
+            </CardHeader>
+            <CardContent>
+              {items.length === 0 ? (
+                <p className='py-6 text-center text-sm text-neutral-500'>No menu items yet.</p>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className='text-left'>Name</TableHead>
+                      <TableHead className='text-left'>Category</TableHead>
+                      <TableHead className='text-right'>Price</TableHead>
+                      <TableHead className='text-right'>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {items.map((item) => (
+                      <TableRow key={item.id}>
+                        <TableCell className='align-middle'>
+                          <div className='font-medium text-neutral-900'>{item.name}</div>
                           {item.price === 0 && (
-                            <p className="mt-0.5 text-xs text-neutral-500">
-                              Open price item
-                            </p>
+                            <p className='mt-0.5 text-xs text-neutral-500'>Open price item</p>
                           )}
-                        </td>
-                        <td className="px-4 py-3 align-middle text-sm text-neutral-700">
-                          {item.category}
-                        </td>
-                        <td className="px-4 py-3 align-middle text-right text-sm text-neutral-800">
+                        </TableCell>
+                        <TableCell className='align-middle text-neutral-700'>{item.category}</TableCell>
+                        <TableCell className='align-middle text-right text-neutral-800'>
                           {item.price === 0
-                            ? "Open"
+                            ? 'Open'
                             : item.price.toLocaleString(undefined, {
-                                style: "currency",
-                                currency: "USD",
+                                style: 'currency',
+                                currency: 'USD',
                               })}
-                        </td>
-                        <td className="px-4 py-3 align-middle text-right text-sm">
-                          <div className="flex justify-end gap-2">
-                            <button
-                              type="button"
+                        </TableCell>
+                        <TableCell className='align-middle text-right'>
+                          <div className='flex justify-end gap-2'>
+                            <Button
+                              type='button'
+                              variant='outline'
+                              size='xs'
                               onClick={() => handleEdit(item)}
-                              className="rounded-full border border-neutral-200 px-3 py-1 text-xs font-medium text-neutral-700 transition hover:bg-neutral-100"
                             >
                               Edit
-                            </button>
-                            <button
-                              type="button"
+                            </Button>
+                            <Button
+                              type='button'
+                              variant='destructive'
+                              size='xs'
                               onClick={() => handleDelete(item.id)}
-                              className="rounded-full border border-red-200 px-3 py-1 text-xs font-medium text-red-600 transition hover:bg-red-50"
                             >
                               Delete
-                            </button>
+                            </Button>
                           </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </section>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
         </section>
       </div>
     </main>
   );
 }
-
