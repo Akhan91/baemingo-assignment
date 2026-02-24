@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { PencilIcon, TrashIcon } from 'lucide-react';
 
 type FormState = {
   name: string;
@@ -133,18 +134,22 @@ export default function MenuBuilderPage() {
             </p>
           </div>
           <nav className='flex gap-2 text-sm'>
-            <Link
-              href='/'
-              className='rounded-full border border-neutral-200 px-4 py-2 text-neutral-700 transition hover:bg-neutral-100'
-            >
-              Home
-            </Link>
-            <Link
-              href='/order'
-              className='rounded-full bg-neutral-900 px-4 py-2 font-medium text-neutral-50 transition hover:bg-neutral-800'
-            >
-              Order Screen
-            </Link>
+            <Button variant='outline' asChild>
+              <Link
+                href='/'
+                className='rounded-md border border-neutral-200 px-4 py-2 text-neutral-700 transition hover:bg-neutral-100'
+              >
+                Home
+              </Link>
+            </Button>
+            <Button variant='default' asChild>
+              <Link
+                href='/order'
+                className='rounded-md bg-neutral-900 px-4 py-2 font-medium text-neutral-50 transition hover:bg-neutral-800'
+              >
+                Order Screen
+              </Link>
+            </Button>
           </nav>
         </header>
 
@@ -272,25 +277,29 @@ export default function MenuBuilderPage() {
                             ? 'Open'
                             : item.price.toLocaleString(undefined, {
                                 style: 'currency',
-                                currency: 'USD',
+                                currency: 'SEK',
                               })}
                         </TableCell>
                         <TableCell className='align-middle text-right'>
-                          <div className='flex justify-end gap-2'>
+                          <div className='flex justify-end gap-4'>
                             <Button
                               type='button'
                               variant='outline'
-                              size='xs'
+                              size='sm'
                               onClick={() => handleEdit(item)}
+                              className='cursor-pointer'
                             >
+                              <PencilIcon className='size-4' />
                               Edit
                             </Button>
                             <Button
                               type='button'
                               variant='destructive'
-                              size='xs'
+                              size='sm'
                               onClick={() => handleDelete(item.id)}
+                              className='cursor-pointer'
                             >
+                              <TrashIcon className='size-4' />
                               Delete
                             </Button>
                           </div>

@@ -33,6 +33,6 @@ export function setMenuItems(items: MenuItem[]): void {
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   } catch {
-    // ignore write errors (e.g. quota exceeded, disabled storage)
+    console.error('Error saving menu items to localStorage');
   }
 }
