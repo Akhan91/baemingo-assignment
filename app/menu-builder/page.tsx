@@ -100,23 +100,23 @@ export default function MenuBuilderPage() {
   }
 
   return (
-    <main className='min-h-screen bg-neutral-50 px-4 py-10 text-neutral-900'>
-      <div className='mx-auto flex max-w-5xl flex-col gap-8'>
-        <MenuBuilderHeader />
+    <div className='py-10'>
+        <div className='mx-auto flex max-w-5xl flex-col gap-8'>
+          <MenuBuilderHeader />
 
-        <section className='grid gap-8 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]'>
-          <MenuItemForm
-            form={form}
-            errors={errors}
-            isEditing={isEditing}
-            onFormChange={setForm}
-            onSubmit={handleSubmit}
-            onReset={resetForm}
-          />
+          <section className='grid gap-8 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]'>
+            <MenuItemForm
+              form={form}
+              errors={errors}
+              isEditing={isEditing}
+              onFormChange={setForm}
+              onSubmit={handleSubmit}
+              onReset={resetForm}
+            />
 
-          <MenuItemsTable items={items} onEdit={handleEdit} onDelete={handleDelete} />
-        </section>
-      </div>
-    </main>
+            <MenuItemsTable items={items} onEdit={handleEdit} onDelete={handleDelete} />
+          </section>
+        </div>
+    </div>
   );
 }

@@ -40,9 +40,7 @@ export function MenuItemForm({
     <Card>
       <CardHeader>
         <CardTitle className='text-lg'>{isEditing ? 'Edit menu item' : 'Add new menu item'}</CardTitle>
-        <CardDescription className='text-xs'>
-          Price 0 means the item is open price. The cashier will choose the price when ordering.
-        </CardDescription>
+        <CardDescription className='text-xs'>Create your menu items here</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={onSubmit} className='space-y-4'>
