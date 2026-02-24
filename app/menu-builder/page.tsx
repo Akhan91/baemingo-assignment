@@ -8,6 +8,7 @@ import {
   MenuBuilderHeader,
   MenuItemForm,
   MenuItemsTable,
+  menuItemFormSchema,
   type FormState,
   type FormErrors,
 } from '@/components/menu-builder';
@@ -30,42 +31,30 @@ export default function MenuBuilderPage() {
     setEditingId(null);
   }
 
-  function validate(): boolean {
-    const nextErrors: FormErrors = {};
-
-    if (!form.name.trim()) {
-      nextErrors.name = 'Name is required.';
-    }
-
-    const priceNumber = Number(form.price);
-    if (Number.isNaN(priceNumber) || form.price.trim() === '') {
-      nextErrors.price = 'Price must be a number.';
-    } else if (priceNumber < 0) {
-      nextErrors.price = 'Price must be greater than or equal to 0.';
-    }
-
-    if (!form.category.trim()) {
-      nextErrors.category = 'Category is required.';
-    }
-
-    setErrors(nextErrors);
-    return Object.keys(nextErrors).length === 0;
-  }
-
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    if (!validate()) return;
+    const result = menuItemFormSchema.safeParse(form);
+    if (!result.success) {
+      const fieldErrors = result.error.flatten().fieldErrors;
+      setErrors({
+        name: fieldErrors.name?.[0],
+        price: fieldErrors.price?.[0],
+        category: fieldErrors.category?.[0],
+      });
+      return;
+    }
 
-    const priceNumber = Number(form.price);
+    const { name, price, category } = result.data;
+    const priceNumber = Number(price);
 
     if (isEditing && editingId) {
       const updated = items.map((item) =>
         item.id === editingId
           ? {
               ...item,
-              name: form.name.trim(),
+              name,
               price: priceNumber,
-              category: form.category.trim(),
+              category,
             }
           : item,
       );
@@ -78,9 +67,9 @@ export default function MenuBuilderPage() {
           typeof crypto !== 'undefined' && 'randomUUID' in crypto
             ? crypto.randomUUID()
             : `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-        name: form.name.trim(),
+        name,
         price: priceNumber,
-        category: form.category.trim(),
+        category,
       };
 
       const updated = [...items, newItem];
