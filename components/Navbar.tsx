@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Button } from './ui/button';
 
 export function Navbar() {
   return (
@@ -8,27 +9,16 @@ export function Navbar() {
           href='/'
           className='font-semibold tracking-tight text-foreground transition-opacity hover:opacity-80'
         >
-          Baemingo
+          Baemingo assignment
         </Link>
-        <nav className='flex items-center gap-1 text-sm font-medium' aria-label='Main'>
-          <Link
-            href='/'
-            className='rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground'
-          >
-            Home
-          </Link>
-          <Link
-            href='/order'
-            className='rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground'
-          >
-            Order
-          </Link>
-          <Link
-            href='/menu-builder'
-            className='rounded-md bg-primary px-3 py-2 text-primary-foreground transition-colors hover:bg-primary/90'
-          >
-            Menu Builder
-          </Link>
+        <nav className='flex items-center gap-3 text-sm font-medium' aria-label='Main'>
+          <Button variant='outline' size='default' asChild>
+            <Link href='/order'>Order</Link>
+          </Button>
+
+          <Button variant='default' size='default' asChild>
+            <Link href='/menu-builder'>Menu Builder</Link>
+          </Button>
         </nav>
       </div>
     </header>
