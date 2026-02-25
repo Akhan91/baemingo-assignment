@@ -24,3 +24,15 @@ export type MenuItemsTableProps = {
   onEdit: (item: MenuItem) => void;
   onDelete: (id: string) => void;
 };
+
+export type FormState = {
+  name: string;
+  price: string;
+  category: string;
+};
+
+export type FormErrors = {
+  name?: string;
+  price?: string;
+  category?: string;
+};

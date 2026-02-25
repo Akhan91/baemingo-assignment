@@ -5,18 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-
-export type FormState = {
-  name: string;
-  price: string;
-  category: string;
-};
-
-export type FormErrors = {
-  name?: string;
-  price?: string;
-  category?: string;
-};
+import { FormErrors, FormState } from '@/lib/types';
 
 type MenuItemFormProps = {
   form: FormState;
