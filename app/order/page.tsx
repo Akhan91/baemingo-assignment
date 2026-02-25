@@ -17,6 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { TrashIcon } from 'lucide-react';
 
 function formatMoney(value: number): string {
   return value.toLocaleString('sv-SE', {
@@ -249,6 +250,7 @@ export default function OrderPage() {
                     onClick={handleClearOrder}
                     className='cursor-pointer'
                   >
+                    <TrashIcon className='size-4' />
                     Clear order
                   </Button>
                 )}

@@ -13,7 +13,7 @@ export function Navbar() {
         </Link>
         <nav className='flex items-center gap-3 text-sm font-medium' aria-label='Main'>
           <Button variant='outline' size='default' asChild>
-            <Link href='/order'>Order</Link>
+            <Link href='/order'>Order Screen</Link>
           </Button>
 
           <Button variant='default' size='default' asChild>
