@@ -3,8 +3,9 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import type { SubmitEvent } from 'react';
-import { MenuItem } from '@/lib/types';
+import { MenuItem, OrderLine } from '@/lib/types';
 import { getMenuItems } from '@/lib/menu-storage';
+import { getOrderLines, saveOrderLines } from '@/lib/order-storage';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,14 +18,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-type OrderLine = {
-  id: string;
-  itemId: string;
-  name: string;
-  unitPrice: number;
-  quantity: number;
-};
-
 function formatMoney(value: number): string {
   return value.toLocaleString('sv-SE', {
     style: 'currency',
@@ -36,21 +29,22 @@ export default function OrderPage() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [orderLines, setOrderLines] = useState<OrderLine[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-
   const [openPriceDialogOpen, setOpenPriceDialogOpen] = useState(false);
   const [openPriceItem, setOpenPriceItem] = useState<MenuItem | null>(null);
   const [openPriceInput, setOpenPriceInput] = useState('');
   const [openPriceError, setOpenPriceError] = useState<string | null>(null);
 
-  // Load menu items from localStorage on client only to avoid hydration issues.
+  // Load menu items and any existing order from localStorage on client only to avoid hydration issues.
   useEffect(() => {
-    const stored = getMenuItems();
+    const storedMenu = getMenuItems();
+    const storedOrder = getOrderLines();
     queueMicrotask(() => {
-      setMenuItems(stored);
-      if (stored.length > 0) {
-        const firstCategory = stored[0]?.category ?? null;
+      setMenuItems(storedMenu);
+      if (storedMenu.length > 0) {
+        const firstCategory = storedMenu[0]?.category ?? null;
         setSelectedCategory(firstCategory);
       }
+      setOrderLines(storedOrder);
     });
   }, []);
 
@@ -81,33 +75,37 @@ export default function OrderPage() {
         (line) => line.itemId === item.id && line.unitPrice === unitPrice,
       );
 
+      let nextOrderLines: OrderLine[];
+
       if (existingIndex >= 0) {
-        const copy = [...current];
-        copy[existingIndex] = {
-          ...copy[existingIndex],
-          quantity: copy[existingIndex].quantity + 1,
+        nextOrderLines = [...current];
+        nextOrderLines[existingIndex] = {
+          ...nextOrderLines[existingIndex],
+          quantity: nextOrderLines[existingIndex].quantity + 1,
         };
-        return copy;
+      } else {
+        const newLine: OrderLine = {
+          id:
+            typeof crypto !== 'undefined' && 'randomUUID' in crypto
+              ? crypto.randomUUID()
+              : `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+          itemId: item.id,
+          name: item.name,
+          unitPrice,
+          quantity: 1,
+        };
+
+        nextOrderLines = [...current, newLine];
       }
 
-      const newLine: OrderLine = {
-        id:
-          typeof crypto !== 'undefined' && 'randomUUID' in crypto
-            ? crypto.randomUUID()
-            : `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-        itemId: item.id,
-        name: item.name,
-        unitPrice,
-        quantity: 1,
-      };
-
-      return [...current, newLine];
+      saveOrderLines(nextOrderLines);
+      return nextOrderLines;
     });
   }
 
   function handleItemClick(item: MenuItem) {
     if (item.price === 0) {
-      // Open price item: prompt for price before adding.
+      // Open price item: prompt user to enter price before adding.
       setOpenPriceItem(item);
       setOpenPriceInput('');
       setOpenPriceError(null);
@@ -142,19 +140,27 @@ export default function OrderPage() {
   }
 
   function handleQuantityChange(id: string, delta: number) {
-    setOrderLines((current) =>
-      current
+    setOrderLines((current) => {
+      const next = current
         .map((line) => (line.id === id ? { ...line, quantity: Math.max(1, line.quantity + delta) } : line))
-        .filter((line) => line.quantity > 0),
-    );
+        .filter((line) => line.quantity > 0);
+
+      saveOrderLines(next);
+      return next;
+    });
   }
 
   function handleRemoveLine(id: string) {
-    setOrderLines((current) => current.filter((line) => line.id !== id));
+    setOrderLines((current) => {
+      const next = current.filter((line) => line.id !== id);
+      saveOrderLines(next);
+      return next;
+    });
   }
 
   function handleClearOrder() {
     setOrderLines([]);
+    saveOrderLines([]);
   }
 
   const hasMenu = menuItems.length > 0;
