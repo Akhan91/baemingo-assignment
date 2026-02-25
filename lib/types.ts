@@ -5,3 +5,12 @@ export type MenuItem = {
   category: string;
 };
 
+export type OrderLine = {
+  id: string;
+  itemId: string;
+  name: string;
+  unitPrice: number;
+  quantity: number;
+};
+
+
