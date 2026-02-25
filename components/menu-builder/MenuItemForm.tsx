@@ -1,7 +1,6 @@
 'use client';
 
-import { FormEvent } from 'react';
-
+import type { SubmitEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,7 +23,7 @@ type MenuItemFormProps = {
   errors: FormErrors;
   isEditing: boolean;
   onFormChange: (next: FormState) => void;
-  onSubmit: (event: FormEvent) => void;
+  onSubmit: (event: SubmitEvent) => void;
   onReset: () => void;
 };
 

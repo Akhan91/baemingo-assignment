@@ -7,10 +7,10 @@ export function getMenuItems(): MenuItem[] {
   if (!isBrowser) return [];
 
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
+    const rawValue = window.localStorage.getItem(STORAGE_KEY);
+    if (!rawValue) return [];
 
-    const parsed = JSON.parse(raw) as unknown;
+    const parsed = JSON.parse(rawValue) as unknown;
     if (!Array.isArray(parsed)) return [];
 
     return parsed.filter((item): item is MenuItem => {
@@ -29,10 +29,9 @@ export function getMenuItems(): MenuItem[] {
 
 export function setMenuItems(items: MenuItem[]): void {
   if (!isBrowser) return;
-
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  } catch {
-    console.error('Error saving menu items to localStorage');
+  } catch (error) {
+    console.error(error, 'Error saving menu items to localStorage');
   }
 }

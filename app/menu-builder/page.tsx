@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
-
+import { useState, useEffect } from 'react';
+import type { SubmitEvent } from 'react';
 import { MenuItem } from '@/lib/types';
 import { getMenuItems, setMenuItems } from '@/lib/menu-storage';
 import {
@@ -14,7 +14,14 @@ import {
 } from '@/components/menu-builder';
 
 export default function MenuBuilderPage() {
-  const [items, setItems] = useState<MenuItem[]>(() => getMenuItems());
+  const [items, setItems] = useState<MenuItem[]>([]);
+
+  // Load from localStorage only on client to avoid hydration mismatch (server has no localStorage).
+  useEffect(() => {
+    const stored = getMenuItems();
+    queueMicrotask(() => setItems(stored));
+  }, []);
+
   const [form, setForm] = useState<FormState>({
     name: '',
     price: '',
@@ -31,7 +38,7 @@ export default function MenuBuilderPage() {
     setEditingId(null);
   }
 
-  function handleSubmit(event: FormEvent) {
+  function handleSubmit(event: SubmitEvent) {
     event.preventDefault();
     const result = menuItemFormSchema.safeParse(form);
     if (!result.success) {
@@ -101,22 +108,22 @@ export default function MenuBuilderPage() {
 
   return (
     <div className='py-10'>
-        <div className='mx-auto flex max-w-5xl flex-col gap-8'>
-          <MenuBuilderHeader />
+      <div className='mx-auto flex max-w-5xl flex-col gap-8'>
+        <MenuBuilderHeader />
 
-          <section className='grid gap-8 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]'>
-            <MenuItemForm
-              form={form}
-              errors={errors}
-              isEditing={isEditing}
-              onFormChange={setForm}
-              onSubmit={handleSubmit}
-              onReset={resetForm}
-            />
+        <section className='grid gap-8 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]'>
+          <MenuItemForm
+            form={form}
+            errors={errors}
+            isEditing={isEditing}
+            onFormChange={setForm}
+            onSubmit={handleSubmit}
+            onReset={resetForm}
+          />
 
-            <MenuItemsTable items={items} onEdit={handleEdit} onDelete={handleDelete} />
-          </section>
-        </div>
+          <MenuItemsTable items={items} onEdit={handleEdit} onDelete={handleDelete} />
+        </section>
+      </div>
     </div>
   );
 }
