@@ -6,26 +6,10 @@ import type { SubmitEvent } from 'react';
 import { MenuItem, OrderLine } from '@/lib/types';
 import { getMenuItems } from '@/lib/menu-storage';
 import { getOrderLines, saveOrderLines } from '@/lib/order-storage';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { OrderItemCard } from '@/components/order-screen/OrderItemCard';
-import { TrashIcon } from 'lucide-react';
-
-function formatMoney(value: number): string {
-  return value.toLocaleString('sv-SE', {
-    style: 'currency',
-    currency: 'SEK',
-  });
-}
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { OrderMenu } from '@/components/order-screen/OrderMenu';
+import { OrderSummary } from '@/components/order-screen/OrderSummary';
+import { OpenPriceDialog } from '@/components/order-screen/OpenPriceDialog';
 
 export default function OrderPage() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -183,7 +167,7 @@ export default function OrderPage() {
             <CardHeader>
               <CardTitle>No menu items</CardTitle>
               <CardDescription>
-                Configure your menu first on the {''}
+                Configure your menu first on the{' '}
                 <a className='text-primary hover:underline' href='/menu-builder'>
                   Menu Builder
                 </a>{' '}
@@ -193,175 +177,42 @@ export default function OrderPage() {
           </Card>
         ) : (
           <section className='grid gap-6 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]'>
-            <Card>
-              <CardHeader>
-                <CardTitle>Menu</CardTitle>
-                <CardDescription>Select a category and tap an item to add it to the order.</CardDescription>
-              </CardHeader>
-              <CardContent className='space-y-4'>
-                {categories.length > 1 && (
-                  <div className='flex flex-wrap gap-2'>
-                    {categories.map((category) => (
-                      <Button
-                        key={category}
-                        type='button'
-                        variant={category === selectedCategory ? 'default' : 'outline'}
-                        size='sm'
-                        onClick={() => setSelectedCategory(category)}
-                      >
-                        {category}
-                      </Button>
-                    ))}
-                  </div>
-                )}
+            <OrderMenu
+              categories={categories}
+              selectedCategory={selectedCategory}
+              onSelectCategory={setSelectedCategory}
+              items={filteredItems}
+              onItemClick={handleItemClick}
+            />
 
-                <div className='grid grid-cols-2 gap-3 md:grid-cols-3'>
-                  {filteredItems.map((item) => (
-                    <OrderItemCard
-                      key={item.id}
-                      item={item}
-                      displayPrice={item.price === 0 ? 'Open price' : formatMoney(item.price)}
-                      onClick={() => handleItemClick(item)}
-                    />
-                  ))}
-
-                  {filteredItems.length === 0 && (
-                    <p className='col-span-full text-sm text-neutral-500'>No items in this category.</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className='flex flex-row items-center justify-between gap-2'>
-                <div className='flex flex-col gap-1'>
-                  <CardTitle>Current order</CardTitle>
-                  <CardDescription>Manage quantities, remove lines, and review the total.</CardDescription>
-                </div>
-                {orderLines.length > 0 && (
-                  <Button
-                    type='button'
-                    variant='outline'
-                    size='sm'
-                    onClick={handleClearOrder}
-                    className='cursor-pointer'
-                  >
-                    <TrashIcon className='size-4' />
-                    Clear order
-                  </Button>
-                )}
-              </CardHeader>
-              <CardContent className='space-y-4'>
-                {orderLines.length === 0 ? (
-                  <p className='text-sm text-neutral-500'>
-                    No items in the order yet. Tap a menu item to add it.
-                  </p>
-                ) : (
-                  <div className='space-y-3'>
-                    {orderLines.map((line) => (
-                      <div
-                        key={line.id}
-                        className='flex items-start justify-between gap-3 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm'
-                      >
-                        <div>
-                          <div className='font-medium text-neutral-900'>{line.name}</div>
-                          <div className='mt-0.5 text-xs text-neutral-600'>
-                            {formatMoney(line.unitPrice)} each
-                          </div>
-                        </div>
-                        <div className='flex flex-col items-end gap-1'>
-                          <div className='flex items-center gap-2'>
-                            <Button
-                              type='button'
-                              variant='outline'
-                              size='xs'
-                              className='cursor-pointer'
-                              onClick={() => handleQuantityChange(line.id, -1)}
-                            >
-                              −
-                            </Button>
-                            <span className='min-w-[2ch] text-center text-sm'>{line.quantity}</span>
-                            <Button
-                              type='button'
-                              variant='outline'
-                              size='xs'
-                              className='cursor-pointer'
-                              onClick={() => handleQuantityChange(line.id, 1)}
-                            >
-                              +
-                            </Button>
-                          </div>
-                          <div className='text-sm font-semibold text-neutral-900'>
-                            {formatMoney(line.unitPrice * line.quantity)}
-                          </div>
-                          <Button
-                            type='button'
-                            variant='destructive'
-                            size='xs'
-                            className='cursor-pointer mt-4'
-                            onClick={() => handleRemoveLine(line.id)}
-                          >
-                            Remove
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <div className='flex items-center justify-between border-t border-dashed border-neutral-200 pt-3 text-sm font-medium'>
-                  <span>Total</span>
-                  <span>{formatMoney(orderTotal)}</span>
-                </div>
-              </CardContent>
-            </Card>
+            <OrderSummary
+              lines={orderLines}
+              total={orderTotal}
+              onChangeQuantity={handleQuantityChange}
+              onRemoveLine={handleRemoveLine}
+              onClear={handleClearOrder}
+            />
           </section>
         )}
       </div>
 
-      <Dialog open={openPriceDialogOpen} onOpenChange={setOpenPriceDialogOpen}>
-        <DialogContent>
-          <form onSubmit={handleConfirmOpenPrice} className='space-y-4'>
-            <DialogHeader>
-              <DialogTitle>Set price</DialogTitle>
-              <DialogDescription>
-                Enter the price in SEK for{' '}
-                <span className='font-medium'>{openPriceItem?.name ?? 'this item'}</span>.
-              </DialogDescription>
-            </DialogHeader>
-            <div className='space-y-1.5'>
-              <Input
-                type='number'
-                min={0}
-                step='0.01'
-                value={openPriceInput}
-                onChange={(event) => {
-                  setOpenPriceInput(event.target.value);
-                  setOpenPriceError(null);
-                }}
-                placeholder='0.00'
-                aria-invalid={Boolean(openPriceError) || undefined}
-              />
-              {openPriceError && <p className='text-xs text-red-600'>{openPriceError}</p>}
-            </div>
-            <DialogFooter className='pt-2'>
-              <Button
-                type='button'
-                variant='outline'
-                onClick={() => {
-                  setOpenPriceDialogOpen(false);
-                  setOpenPriceItem(null);
-                  setOpenPriceInput('');
-                  setOpenPriceError(null);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button type='submit'>Add to order</Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <OpenPriceDialog
+        open={openPriceDialogOpen}
+        item={openPriceItem}
+        inputValue={openPriceInput}
+        error={openPriceError}
+        onChangeInput={(value) => {
+          setOpenPriceInput(value);
+          setOpenPriceError(null);
+        }}
+        onCancel={() => {
+          setOpenPriceDialogOpen(false);
+          setOpenPriceItem(null);
+          setOpenPriceInput('');
+          setOpenPriceError(null);
+        }}
+        onSubmit={handleConfirmOpenPrice}
+      />
     </main>
   );
 }
