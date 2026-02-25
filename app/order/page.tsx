@@ -17,6 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { OrderItemCard } from '@/components/order-screen/OrderItemCard';
 import { TrashIcon } from 'lucide-react';
 
 function formatMoney(value: number): string {
@@ -216,17 +217,12 @@ export default function OrderPage() {
 
                 <div className='grid grid-cols-2 gap-3 md:grid-cols-3'>
                   {filteredItems.map((item) => (
-                    <button
+                    <OrderItemCard
                       key={item.id}
-                      type='button'
+                      item={item}
+                      displayPrice={item.price === 0 ? 'Open price' : formatMoney(item.price)}
                       onClick={() => handleItemClick(item)}
-                      className='flex flex-col items-start justify-between rounded-lg border border-neutral-200 bg-white px-3 py-2 text-left text-sm shadow-xs transition hover:border-neutral-900 hover:shadow-sm'
-                    >
-                      <span className='font-medium text-neutral-900'>{item.name}</span>
-                      <span className='mt-1 text-xs text-neutral-600'>
-                        {item.price === 0 ? 'Open price' : formatMoney(item.price)}
-                      </span>
-                    </button>
+                    />
                   ))}
 
                   {filteredItems.length === 0 && (

@@ -13,4 +13,14 @@ export type OrderLine = {
   quantity: number;
 };
 
+export type OrderItemCardProps = {
+  item: MenuItem;
+  displayPrice: string;
+  onClick: () => void;
+};
 
+export type MenuItemsTableProps = {
+  items: MenuItem[];
+  onEdit: (item: MenuItem) => void;
+  onDelete: (id: string) => void;
+};

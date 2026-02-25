@@ -1,16 +1,10 @@
 'use client';
 
-import { MenuItem } from '@/lib/types';
+import { MenuItemsTableProps } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { PencilIcon, TrashIcon } from 'lucide-react';
-
-type MenuItemsTableProps = {
-  items: MenuItem[];
-  onEdit: (item: MenuItem) => void;
-  onDelete: (id: string) => void;
-};
 
 export function MenuItemsTable({ items, onEdit, onDelete }: MenuItemsTableProps) {
   return (
@@ -43,9 +37,7 @@ export function MenuItemsTable({ items, onEdit, onDelete }: MenuItemsTableProps)
                 <TableRow key={item.id}>
                   <TableCell className='align-middle'>
                     <div className='font-medium text-neutral-900'>{item.name}</div>
-                    {item.price === 0 && (
-                      <p className='mt-0.5 text-xs text-neutral-500'>Open price item</p>
-                    )}
+                    {item.price === 0 && <p className='mt-0.5 text-xs text-neutral-500'>Open price item</p>}
                   </TableCell>
                   <TableCell className='align-middle text-neutral-700'>{item.category}</TableCell>
                   <TableCell className='align-middle text-right text-neutral-800'>
