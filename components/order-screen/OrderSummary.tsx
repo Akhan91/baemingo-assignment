@@ -13,14 +13,22 @@ function formatMoney(value: number): string {
 }
 
 type OrderSummaryProps = {
-  lines: OrderLine[];
+  orderLines: OrderLine[];
   total: number;
   onChangeQuantity: (id: string, delta: number) => void;
   onRemoveLine: (id: string) => void;
   onClear: () => void;
+  onSendOrder: () => void;
 };
 
-export function OrderSummary({ lines, total, onChangeQuantity, onRemoveLine, onClear }: OrderSummaryProps) {
+export function OrderSummary({
+  orderLines, // this is a single entry in the cart
+  total,
+  onChangeQuantity,
+  onRemoveLine,
+  onClear,
+  onSendOrder,
+}: OrderSummaryProps) {
   return (
     <Card>
       <CardHeader className='flex flex-row items-center justify-between gap-2'>
@@ -28,7 +36,7 @@ export function OrderSummary({ lines, total, onChangeQuantity, onRemoveLine, onC
           <CardTitle>Current order</CardTitle>
           <CardDescription>Manage quantities, remove lines, and review the total.</CardDescription>
         </div>
-        {lines.length > 0 && (
+        {orderLines.length > 0 && (
           <Button type='button' variant='outline' size='sm' onClick={onClear} className='cursor-pointer'>
             <TrashIcon className='size-4' />
             Clear order
@@ -36,11 +44,11 @@ export function OrderSummary({ lines, total, onChangeQuantity, onRemoveLine, onC
         )}
       </CardHeader>
       <CardContent className='space-y-4'>
-        {lines.length === 0 ? (
+        {orderLines.length === 0 ? (
           <p className='text-sm text-neutral-500'>No items in the order yet. Tap a menu item to add it.</p>
         ) : (
           <div className='space-y-3'>
-            {lines.map((line) => (
+            {orderLines.map((line) => (
               <div
                 key={line.id}
                 className='flex items-start justify-between gap-3 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm'
@@ -93,6 +101,14 @@ export function OrderSummary({ lines, total, onChangeQuantity, onRemoveLine, onC
           <span>Total</span>
           <span>{formatMoney(total)}</span>
         </div>
+
+        {orderLines.length > 0 && (
+          <div className='flex justify-end'>
+            <Button type='button' size='sm' onClick={onSendOrder} className='cursor-pointer'>
+              Send order
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

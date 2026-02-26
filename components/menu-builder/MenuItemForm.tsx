@@ -57,8 +57,8 @@ export function MenuItemForm({
             <Label htmlFor='price'>Price</Label>
             <Input
               id='price'
-              type='number'
-              min={0}
+              type='text'
+              inputMode='decimal'
               value={form.price}
               onChange={(e) =>
                 onFormChange({
@@ -66,7 +66,7 @@ export function MenuItemForm({
                   price: e.target.value,
                 })
               }
-              placeholder='3.50'
+              placeholder='49,90'
               aria-invalid={Boolean(errors.price) || undefined}
             />
             <p className='text-xs text-neutral-500'>

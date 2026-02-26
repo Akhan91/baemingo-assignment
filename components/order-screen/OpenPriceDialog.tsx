@@ -46,7 +46,6 @@ export function OpenPriceDialog({
             <Input
               type='number'
               min={0}
-              step='0.01'
               value={inputValue}
               onChange={(event) => onChangeInput(event.target.value)}
               placeholder='0.00'

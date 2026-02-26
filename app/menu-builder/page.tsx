@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from 'react';
 import type { SubmitEvent } from 'react';
 import { MenuItem } from '@/lib/types';
 import { getMenuItems, setMenuItems } from '@/lib/menu-storage';
@@ -15,17 +15,17 @@ import {
 
 export default function MenuBuilderPage() {
   const [items, setItems] = useState<MenuItem[]>([]);
-
   // Load from localStorage only on client to avoid hydration mismatch (server has no localStorage).
   useEffect(() => {
     const stored = getMenuItems();
+    //queueMicrotask() defers a state update so it doesn’t happen synchronously in the current call stack. Acts like a promise.
     queueMicrotask(() => setItems(stored));
   }, []);
 
   const [form, setForm] = useState<FormState>({
-    name: "",
-    price: "",
-    category: "",
+    name: '',
+    price: '',
+    category: '',
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -33,7 +33,7 @@ export default function MenuBuilderPage() {
   const isEditing = editingId !== null;
 
   function resetForm() {
-    setForm({ name: "", price: "", category: "" });
+    setForm({ name: '', price: '', category: '' });
     setErrors({});
     setEditingId(null);
   }
@@ -71,7 +71,7 @@ export default function MenuBuilderPage() {
     } else {
       const newItem: MenuItem = {
         id:
-          typeof crypto !== "undefined" && "randomUUID" in crypto
+          typeof crypto !== 'undefined' && 'randomUUID' in crypto
             ? crypto.randomUUID()
             : `${Date.now()}-${Math.random().toString(16).slice(2)}`,
         name,
@@ -91,7 +91,13 @@ export default function MenuBuilderPage() {
     setEditingId(item.id);
     setForm({
       name: item.name,
-      price: String(item.price),
+      price:
+        item.price === 0
+          ? '0'
+          : item.price.toLocaleString('sv-SE', {
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 2,
+            }),
       category: item.category,
     });
     setErrors({});
@@ -117,11 +123,11 @@ export default function MenuBuilderPage() {
   }, [items]);
 
   return (
-    <div className="py-10">
-      <div className="mx-auto flex max-w-5xl flex-col gap-8">
+    <div className='py-10'>
+      <div className='mx-auto flex max-w-5xl flex-col gap-8'>
         <MenuBuilderHeader />
 
-        <section className="grid gap-8 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+        <section className='grid gap-8 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]'>
           <MenuItemForm
             form={form}
             errors={errors}
@@ -132,11 +138,7 @@ export default function MenuBuilderPage() {
             onReset={resetForm}
           />
 
-          <MenuItemsTable
-            items={items}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
+          <MenuItemsTable items={items} onEdit={handleEdit} onDelete={handleDelete} />
         </section>
       </div>
     </div>

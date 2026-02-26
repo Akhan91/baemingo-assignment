@@ -5,7 +5,8 @@ export const menuItemFormSchema = z.object({
   name: z.string().trim().min(1, 'Name is required.').transform(capitalizeFirstLetter),
   price: z
     .string()
-    .refine((s) => s.trim() !== '' && !Number.isNaN(Number(s)), {
+    .transform((s) => s.trim().replace(',', '.'))
+    .refine((s) => s !== '' && !Number.isNaN(Number(s)), {
       message: 'Price must be a number.',
     })
     .refine((s) => Number(s) >= 0, {
