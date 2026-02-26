@@ -43,7 +43,7 @@ export function MenuItemsTable({ items, onEdit, onDelete }: MenuItemsTableProps)
                   <TableCell className='align-middle text-right text-neutral-800'>
                     {item.price === 0
                       ? 'Open'
-                      : item.price.toLocaleString(undefined, {
+                      : item.price.toLocaleString('sv-SE', {
                           style: 'currency',
                           currency: 'SEK',
                         })}

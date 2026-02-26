@@ -91,7 +91,13 @@ export default function MenuBuilderPage() {
     setEditingId(item.id);
     setForm({
       name: item.name,
-      price: String(item.price),
+      price:
+        item.price === 0
+          ? '0'
+          : item.price.toLocaleString('sv-SE', {
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 2,
+            }),
       category: item.category,
     });
     setErrors({});
