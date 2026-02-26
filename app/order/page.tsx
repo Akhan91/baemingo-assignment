@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-
 import type { SubmitEvent } from 'react';
 import { MenuItem, OrderLine } from '@/lib/types';
 import { getMenuItems } from '@/lib/menu-storage';
@@ -20,7 +19,7 @@ export default function OrderPage() {
   const [openPriceInput, setOpenPriceInput] = useState('');
   const [openPriceError, setOpenPriceError] = useState<string | null>(null);
 
-  // Load menu items and any existing order from localStorage on client only to avoid hydration issues.
+  // Load menu items and any existing order from localStorage on client only, to avoid hydration issues.
   useEffect(() => {
     const storedMenu = getMenuItems();
     const storedOrder = getOrderLines();
@@ -54,9 +53,11 @@ export default function OrderPage() {
     [orderLines],
   );
 
+  const hasMenu = menuItems.length > 0;
+
   function addLineForItem(item: MenuItem, unitPrice: number) {
     setOrderLines((current) => {
-      // For fixed-price items, merge by item+price; for open-price we also merge if same price.
+      // This isfor preventing duplicate items in the cart if they have the same price, since open price items can have the same price.
       const existingIndex = current.findIndex(
         (line) => line.itemId === item.id && line.unitPrice === unitPrice,
       );
@@ -149,7 +150,12 @@ export default function OrderPage() {
     saveOrderLines([]);
   }
 
-  const hasMenu = menuItems.length > 0;
+  function handleSendOrder() {
+    if (orderLines.length === 0) return;
+    // Alert is used for simplicity, to confirm order is sent
+    alert('Order sent!');
+    handleClearOrder();
+  }
 
   return (
     <main className='min-h-screen bg-neutral-50 px-4 py-10 text-neutral-900'>
@@ -186,11 +192,12 @@ export default function OrderPage() {
             />
 
             <OrderSummary
-              lines={orderLines}
+              orderLines={orderLines}
               total={orderTotal}
               onChangeQuantity={handleQuantityChange}
               onRemoveLine={handleRemoveLine}
               onClear={handleClearOrder}
+              onSendOrder={handleSendOrder}
             />
           </section>
         )}
