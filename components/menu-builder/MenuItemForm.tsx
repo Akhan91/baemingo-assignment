@@ -5,23 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-
-export type FormState = {
-  name: string;
-  price: string;
-  category: string;
-};
-
-export type FormErrors = {
-  name?: string;
-  price?: string;
-  category?: string;
-};
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { FormErrors, FormState } from '@/lib/types';
 
 type MenuItemFormProps = {
   form: FormState;
   errors: FormErrors;
   isEditing: boolean;
+  categories: string[];
   onFormChange: (next: FormState) => void;
   onSubmit: (event: SubmitEvent) => void;
   onReset: () => void;
@@ -31,6 +22,7 @@ export function MenuItemForm({
   form,
   errors,
   isEditing,
+  categories,
   onFormChange,
   onSubmit,
   onReset,
@@ -67,7 +59,6 @@ export function MenuItemForm({
               id='price'
               type='number'
               min={0}
-              step='0.01'
               value={form.price}
               onChange={(e) =>
                 onFormChange({
@@ -86,19 +77,61 @@ export function MenuItemForm({
 
           <div className='space-y-1.5'>
             <Label htmlFor='category'>Category</Label>
-            <Input
-              id='category'
-              type='text'
-              value={form.category}
-              onChange={(e) =>
-                onFormChange({
-                  ...form,
-                  category: e.target.value,
-                })
-              }
-              placeholder='Drinks'
-              aria-invalid={Boolean(errors.category) || undefined}
-            />
+
+            {categories.length > 0 ? (
+              <div className='space-y-1.5'>
+                <Select
+                  value={categories.includes(form.category) ? form.category : ''}
+                  onValueChange={(value) =>
+                    onFormChange({
+                      ...form,
+                      category: value,
+                    })
+                  }
+                >
+                  <SelectTrigger aria-invalid={Boolean(errors.category) || undefined}>
+                    <SelectValue placeholder='Select a category' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <p className='text-xs text-neutral-500'>Or type a new category name:</p>
+                <Input
+                  id='category'
+                  type='text'
+                  value={form.category}
+                  onChange={(e) =>
+                    onFormChange({
+                      ...form,
+                      category: e.target.value,
+                    })
+                  }
+                  placeholder='Desserts'
+                  aria-invalid={Boolean(errors.category) || undefined}
+                />
+              </div>
+            ) : (
+              <Input
+                id='category'
+                type='text'
+                value={form.category}
+                onChange={(e) =>
+                  onFormChange({
+                    ...form,
+                    category: e.target.value,
+                  })
+                }
+                placeholder='Drinks'
+                aria-invalid={Boolean(errors.category) || undefined}
+              />
+            )}
+
             {errors.category && <p className='text-xs text-red-600'>{errors.category}</p>}
           </div>
 

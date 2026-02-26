@@ -12,12 +12,12 @@ export function Navbar() {
           Baemingo assignment
         </Link>
         <nav className='flex items-center gap-3 text-sm font-medium' aria-label='Main'>
-          <Button variant='outline' size='default' asChild>
-            <Link href='/order'>Order</Link>
-          </Button>
-
           <Button variant='default' size='default' asChild>
             <Link href='/menu-builder'>Menu Builder</Link>
+          </Button>
+
+          <Button variant='outline' size='default' asChild>
+            <Link href='/order'>Order Screen</Link>
           </Button>
         </nav>
       </div>

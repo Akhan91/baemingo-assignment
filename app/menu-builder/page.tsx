@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useMemo, useState, useEffect } from "react";
 import type { SubmitEvent } from 'react';
 import { MenuItem } from '@/lib/types';
 import { getMenuItems, setMenuItems } from '@/lib/menu-storage';
@@ -23,9 +23,9 @@ export default function MenuBuilderPage() {
   }, []);
 
   const [form, setForm] = useState<FormState>({
-    name: '',
-    price: '',
-    category: '',
+    name: "",
+    price: "",
+    category: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -33,7 +33,7 @@ export default function MenuBuilderPage() {
   const isEditing = editingId !== null;
 
   function resetForm() {
-    setForm({ name: '', price: '', category: '' });
+    setForm({ name: "", price: "", category: "" });
     setErrors({});
     setEditingId(null);
   }
@@ -71,7 +71,7 @@ export default function MenuBuilderPage() {
     } else {
       const newItem: MenuItem = {
         id:
-          typeof crypto !== 'undefined' && 'randomUUID' in crypto
+          typeof crypto !== "undefined" && "randomUUID" in crypto
             ? crypto.randomUUID()
             : `${Date.now()}-${Math.random().toString(16).slice(2)}`,
         name,
@@ -106,22 +106,37 @@ export default function MenuBuilderPage() {
     }
   }
 
+  const categories = useMemo(() => {
+    const set = new Set<string>();
+    for (const item of items) {
+      if (item.category) {
+        set.add(item.category);
+      }
+    }
+    return Array.from(set);
+  }, [items]);
+
   return (
-    <div className='py-10'>
-      <div className='mx-auto flex max-w-5xl flex-col gap-8'>
+    <div className="py-10">
+      <div className="mx-auto flex max-w-5xl flex-col gap-8">
         <MenuBuilderHeader />
 
-        <section className='grid gap-8 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]'>
+        <section className="grid gap-8 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
           <MenuItemForm
             form={form}
             errors={errors}
             isEditing={isEditing}
+            categories={categories}
             onFormChange={setForm}
             onSubmit={handleSubmit}
             onReset={resetForm}
           />
 
-          <MenuItemsTable items={items} onEdit={handleEdit} onDelete={handleDelete} />
+          <MenuItemsTable
+            items={items}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
         </section>
       </div>
     </div>
