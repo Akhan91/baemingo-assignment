@@ -23,6 +23,7 @@ export default function OrderPage() {
   useEffect(() => {
     const storedMenu = getMenuItems();
     const storedOrder = getOrderLines();
+    //queueMicrotask() defers a state update so it doesn’t happen synchronously in the current call stack. Acts like a promise.
     queueMicrotask(() => {
       setMenuItems(storedMenu);
       if (storedMenu.length > 0) {
