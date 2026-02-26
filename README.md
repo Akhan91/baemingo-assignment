@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Baemingo – Menu Builder + Order Screen
 
-## Getting Started
+This is a small example of an app which acts like a POS for this specific assignment.
 
-First, run the development server:
+### How to run locally
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Start the dev server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3. Open `http://localhost:3000` in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Overview of approach / architecture
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Stack**: Next.js App Router, React, TypeScript, Tailwind, shadcn/ui + Radix UI for components.
 
-## Learn More
+- **Data model**:
+  - `MenuItem`: stored in `localStorage` (key `baemingo-menu`) via helpers in `lib/menu-storage.ts`.
+  - `OrderLine`: current order lines stored in `localStorage` (key `baemingo-order`) via `lib/order-storage.ts`.
+    This replicates two different tables in a database.
 
-To learn more about Next.js, take a look at the following resources:
+- **Menu Builder (`/menu-builder`)**:
+  - CRUD for menu items with validation via Zod (`components/menu-builder/schema.ts`).
+  - Split components into seperate files and folder for easier maintainance and readability.
+  - Categories are selected from a dropdown (derived from existing items) with an “Add category” action.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Order Screen (`/order`)**:
+  - Reads the same `MenuItem`s from `localStorage`.
+  - Left side: category filter + grid of items (uses `OrderMenu` and `OrderItemCard` components).
+  - Right side: order summary (`OrderSummary`) showing line items, quantity controls, total, and actions.
+  - Open-price items (`price = 0`) prompt for a price using `OpenPriceDialog` before adding.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Assumptions made
 
-## Deploy on Vercel
+- Currency is **SEK**:
+  - Display uses Swedish locale formatting (`sv-SE`) in both builder and order screen.
+- (`Category`) for menu builder is a dropdown for existing categories. For adding new categories there's a seperate field.
+- (`Clear Order` button for deleting the current cart, instead of deleting each item individually).
+- An open price item which is a duplicate is not shown as a seperate item but added to the former one.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### What I’d improve with more time
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Since this is supposed to be a small app I've tried not to over engineer it.
+I kept the architecture intentionally simple. Part of being a good developer is paying attention to the task instructions / demands and knowing when to keep things simple.
+
+Some things to improve:
+
+- Add tests
+- Have a proper backend with database instead of local storage, maybe something like Supabase.
+- Adding a login page for users with auth setup.
+- React Hook Form for handling forms depending on the complexity.
+- Add order history for keeping track of orders made.
+- Keep track of the status of orders (delivered, in progress, cancelled etc.)
+
+- Improve UX:
+  - Replace `alert` with a confirmation modal or page.
+  - Give user feedback when adding / confirming orders with proper toasts and dialogs
+  - Have a button for adding new categories instead of input. Preventing the user to accidentally type a new category.
