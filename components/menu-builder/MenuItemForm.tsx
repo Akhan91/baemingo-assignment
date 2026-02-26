@@ -59,7 +59,6 @@ export function MenuItemForm({
               id='price'
               type='number'
               min={0}
-              step='0.5'
               value={form.price}
               onChange={(e) =>
                 onFormChange({
